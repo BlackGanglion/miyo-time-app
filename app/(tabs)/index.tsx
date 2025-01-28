@@ -1,74 +1,89 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, Button, TouchableOpacity } from 'react-native';
+import { ProgressBar } from '@/components/ProgressBar';
+const goals = [
+  { id: '1', title: 'Ted 100 场', progress: 67, total: 100 },
+  { id: '2', title: '减肥 6 斤', progress: 3, total: 6 },
+  { id: '3', title: '骑行 1000 km', progress: 960, total: 1000 },
+  { id: '4', title: '攒 2w 旅行基金', progress: 15000, total: 20000 },
+  { id: '5', title: '考出初级会计证', progress: 0, total: 1 },
+  { id: '6', title: '旅游计划', progress: 0, total: 4 },
+];
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const GoalItem = ({ title, progress, total }: { title: string; progress: number; total: number }) => (
+  <View style={styles.goalItem}>
+    <Text style={styles.title}>{title}</Text>
+    <Text>{`${progress}/${total}`}</Text>
+    <ProgressBar progress={progress / total * 100} color="#6200ee" />
+    <Button title="剩余 31d" onPress={() => {}} />
+  </View>
+);
 
-export default function HomeScreen() {
+export default function GoalList() {
+  const handleAddGoal = () => {
+    // 添加目标的逻辑
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>目标列表</Text>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddGoal}>
+          <Text style={styles.addButtonText}>+ 创建目标</Text>
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        data={goals}
+        renderItem={({ item }) => <GoalItem {...item} />}
+        keyExtractor={item => item.id}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  headerContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 16,
   },
-  stepContainer: {
-    gap: 8,
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  addButton: {
+    backgroundColor: '#6200ee',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  goalItem: {
+    backgroundColor: '#fff',
+    padding: 16,
     marginBottom: 8,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  progressBar: {
+    height: 10,
+    borderRadius: 5,
+    marginVertical: 8,
   },
 });

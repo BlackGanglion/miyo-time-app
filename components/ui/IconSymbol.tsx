@@ -9,10 +9,9 @@ import { OpaqueColorValue, StyleProp, ViewStyle } from 'react-native';
 const MAPPING = {
   // See MaterialIcons here: https://icons.expo.fyi
   // See SF Symbols in the SF Symbols app on Mac.
-  'house.fill': 'home',
-  'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
-  'chevron.right': 'chevron-right',
+  'checklist': 'task',
+  'target': 'crisis-alert',
+  'bookmark': 'bookmark'
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],
