@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 
-export const ProgressBar = ({ progress = 0, color = '#4caf50', height = 20 }) => {
+export const ProgressBar = ({ progress = 0, color = '#3b82f6', height = 20 }) => {
   return (
     <View style={[styles.container, { height }]}>
       <View
@@ -20,10 +20,11 @@ export const ProgressBar = ({ progress = 0, color = '#4caf50', height = 20 }) =>
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     borderRadius: 10,
     overflow: 'hidden',
     position: 'relative',
+    marginVertical: 8,
   },
   progress: {
     height: '100%',
@@ -34,6 +35,6 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlign: 'center',
     fontWeight: 'bold',
-    color: '#000',
+    color: '#fff',
   },
 });

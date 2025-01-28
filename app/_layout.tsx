@@ -16,6 +16,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    antoutline: require('@ant-design/icons-react-native/fonts/antoutline.ttf'),
   });
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          <Stack.Screen name="createGoal" options={{ title: '创建目标' }} />
         </Stack>
         <StatusBar style="auto" />
       </SafeAreaView>
