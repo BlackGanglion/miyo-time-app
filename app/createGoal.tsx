@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, InputItem, List, DatePicker, Provider } from '@ant-design/react-native';
+import { Button, InputItem, List, DatePicker, Provider, Modal } from '@ant-design/react-native';
+import { fetchData } from '@/api/http';
+import { useRouter } from 'expo-router';
 
 export default function CreateGoal() {
   const [goalName, setGoalName] = useState('');
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
+  const router = useRouter();
 
-  const handleCreateGoal = () => {
-    console.log('Goal Created:', { goalName, startTime, endTime });
+  const handleCreateGoal = async () => {
+    try {
+      const data = await fetchData('/goals', 'POST', {
+        goalName, startTime, endTime
+      });
+
+      // 显示成功消息
+      Modal.alert('成功', '目标创建成功', [
+        { text: '确定', onPress: () => router.push('/(tabs)') }
+      ]);
+    } catch (error) {
+      // 处理错误
+      Modal.alert('错误', '目标创建失败，请重试');
+    }
   };
 
   return (

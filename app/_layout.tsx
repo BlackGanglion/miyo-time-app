@@ -1,5 +1,4 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -31,14 +30,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="createGoal" options={{ title: '创建目标' }} />
-        </Stack>
-        <StatusBar style="auto" />
-      </SafeAreaView>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ title: '时间管理', headerShown: true }} />
+        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="createGoal" options={{ title: '创建目标', headerShown: true }} />
+      </Stack>
+      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }

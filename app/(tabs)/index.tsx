@@ -1,45 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Button, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ProgressBar } from '@/components/ProgressBar';
+import { fetchData } from '@/api/http';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
-const goals = [
-  { id: '1', title: 'Ted 100 场', progress: 67, total: 100, subGoals: ['观看 10 场', '总结 5 场'] },
-  { id: '2', title: '减肥 6 斤', progress: 3, total: 6, subGoals: ['跑步 5 公里', '控制饮食'] },
-  { id: '3', title: '骑行 1000 km', progress: 960, total: 1000, subGoals: ['骑行 100 公里'] },
-  { id: '4', title: '攒 2w 旅行基金', progress: 15000, total: 20000, subGoals: ['存 5000 元'] },
-  { id: '5', title: '考出初级会计证', progress: 0, total: 1, subGoals: ['完成课程'] },
-  { id: '6', title: '旅游计划', progress: 0, total: 4, subGoals: ['制定行程'] },
-];
+interface Goal {
+  id: string;
+  goalName: string;
+  progress: number;
+  total: number;
+  subGoals: string[];
+  startTime: string;
+  endTime: string;
+}
 
-const GoalItem = ({ title, progress, total, subGoals }: { title: string; progress: number; total: number; subGoals: string[] }) => {
+const GoalItem = ({ goalName, progress, total, subGoals, startTime, endTime }: Goal) => {
   const [expanded, setExpanded] = useState(false);
+
+  const calculateRemainingDays = () => {
+    const now = new Date();
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (now < start) {
+      const daysUntilStart = Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return `还有 ${daysUntilStart} 天开始`;
+    } else if (now >= start && now <= end) {
+      const daysRemaining = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return `剩余 ${daysRemaining} 天`;
+    } else {
+      const daysPastEnd = Math.ceil((now.getTime() - end.getTime()) / (1000 * 60 * 60 * 24));
+      return `已结束 ${daysPastEnd} 天`;
+    }
+  };
 
   return (
     <View style={styles.goalItem}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{title}</Text>
-        <TouchableOpacity style={styles.remainingButton} onPress={() => {}}>
-          <Text style={styles.remainingButtonText}>剩余 31d</Text>
+        <Text style={styles.title}>{goalName}</Text>
+        <TouchableOpacity style={styles.remainingButton} onPress={() => { }}>
+          <Text style={styles.remainingButtonText}>{calculateRemainingDays()}</Text>
         </TouchableOpacity>
       </View>
-      <ProgressBar progress={progress / total * 100} color="#3b82f6" />
+      {/* <ProgressBar progress={progress / total * 100} color="#3b82f6" /> */}
       <TouchableOpacity onPress={() => setExpanded(!expanded)}>
         <Text style={styles.expandButtonText}>{expanded ? '收起' : '展开'}</Text>
       </TouchableOpacity>
-      {expanded && (
-        <FlatList
-          data={subGoals}
-          renderItem={({ item }) => <Text style={styles.subGoalText}>{item}</Text>}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      )}
+      {/* expanded && (
+            <FlatList
+              data={subGoals}
+              renderItem={({ item }) => <Text style={styles.subGoalText}>{item}</Text>}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          )*/}
     </View>
   );
 };
 
 export default function GoalList() {
   const router = useRouter();
+  const [goals, setGoals] = useState<Goal[]>([]);
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const data = await fetchData('/goals', 'GET');
+        setGoals(data);
+      } catch (error) {
+        console.error('Failed to fetch goals:', error);
+      }
+    };
+
+    fetchGoals();
+  }, []);
 
   const handleAddGoal = () => {
     router.push('/createGoal');
@@ -53,10 +87,18 @@ export default function GoalList() {
           <Text style={styles.addButtonText}>+ 创建目标</Text>
         </TouchableOpacity>
       </View>
-      <FlatList
+      <SwipeListView
         data={goals}
         renderItem={({ item }) => <GoalItem {...item} />}
         keyExtractor={item => item.id}
+        renderHiddenItem={(data) => (
+          <TouchableOpacity style={styles.deleteButton} onPress={() => {
+            console.log(data);
+          }}>
+            <Text style={styles.deleteButtonText}>删除</Text>
+          </TouchableOpacity>
+        )}
+        rightOpenValue={-75}
       />
     </View>
   );
@@ -128,5 +170,24 @@ const styles = StyleSheet.create({
     color: '#007bff',
     fontSize: 14,
     marginTop: 8,
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 8,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 0,
+    width: 75,
+    height: 88,
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
