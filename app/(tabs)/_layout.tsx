@@ -8,6 +8,11 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+export const unstable_settings = {
+  // Ensure any route can link back to `/`
+  initialRouteName: '(goal)',
+};
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -27,21 +32,21 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="index"
+        name="(goal)"
         options={{
           title: 'Goal',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="target" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="task"
+        name="(task)"
         options={{
           title: 'Task',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="record"
+        name="(record)"
         options={{
           title: 'Record',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="bookmark" color={color} />,

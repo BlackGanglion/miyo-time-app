@@ -31,9 +31,8 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ title: '时间管理', headerShown: true }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
-        <Stack.Screen name="createGoal" options={{ title: '创建目标', headerShown: true }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

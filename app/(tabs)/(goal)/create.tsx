@@ -18,7 +18,7 @@ export default function CreateGoal() {
 
       // 显示成功消息
       Modal.alert('成功', '目标创建成功', [
-        { text: '确定', onPress: () => router.push('/(tabs)') }
+        { text: '确定', onPress: () => router.push('/(tabs)/(goal)') }
       ]);
     } catch (error) {
       // 处理错误

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, FlatList, Button, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ProgressBar } from '@/components/ProgressBar';
 import { fetchData } from '@/api/http';
@@ -47,13 +47,13 @@ const GoalItem = ({ goalName, progress, total, subGoals, startTime, endTime }: G
       <TouchableOpacity onPress={() => setExpanded(!expanded)}>
         <Text style={styles.expandButtonText}>{expanded ? '收起' : '展开'}</Text>
       </TouchableOpacity>
-      {/* expanded && (
-            <FlatList
-              data={subGoals}
-              renderItem={({ item }) => <Text style={styles.subGoalText}>{item}</Text>}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          )*/}
+      {expanded && (
+        <FlatList
+          data={['xxxx', 'yyyy', 'zzzz']}
+          renderItem={({ item }) => <Text style={styles.subGoalText}>{item}</Text>}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      )}
     </View>
   );
 };
@@ -63,20 +63,30 @@ export default function GoalList() {
   const [goals, setGoals] = useState<Goal[]>([]);
 
   useEffect(() => {
-    const fetchGoals = async () => {
-      try {
-        const data = await fetchData('/goals', 'GET');
-        setGoals(data);
-      } catch (error) {
-        console.error('Failed to fetch goals:', error);
-      }
-    };
-
     fetchGoals();
   }, []);
 
+  const fetchGoals = async () => {
+    try {
+      const data = await fetchData('/goals', 'GET');
+      setGoals(data);
+    } catch (error) {
+      console.error('Failed to fetch goals:', error);
+    }
+  };
+
   const handleAddGoal = () => {
-    router.push('/createGoal');
+    router.push('/(tabs)/(goal)/create');
+  };
+
+  const handleDeleteGoal = async (goalId: string) => {
+    try {
+      await fetchData(`/goals/${goalId}`, 'DELETE');
+      Alert.alert('成功', '目标已删除');
+      fetchGoals(); // 刷新目标列表
+    } catch (error) {
+      Alert.alert('错误', '删除目标失败，请重试');
+    }
   };
 
   return (
@@ -91,10 +101,8 @@ export default function GoalList() {
         data={goals}
         renderItem={({ item }) => <GoalItem {...item} />}
         keyExtractor={item => item.id}
-        renderHiddenItem={(data) => (
-          <TouchableOpacity style={styles.deleteButton} onPress={() => {
-            console.log(data);
-          }}>
+        renderHiddenItem={({ item }) => (
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteGoal(item.id)}>
             <Text style={styles.deleteButtonText}>删除</Text>
           </TouchableOpacity>
         )}
@@ -133,7 +141,6 @@ const styles = StyleSheet.create({
   goalItem: {
     backgroundColor: '#fff',
     padding: 16,
-    marginBottom: 8,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -183,7 +190,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     width: 75,
-    height: 88,
+    height: '100%',
     borderRadius: 8,
   },
   deleteButtonText: {
