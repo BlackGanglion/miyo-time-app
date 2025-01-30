@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, FlatList, Button, TouchableOpacity, StatusBar, Alert } from 'react-native';
+import { Modal as AntdModal, Toast as AntdToast, Provider } from '@ant-design/react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ProgressBar } from '@/components/ProgressBar';
 import { fetchData } from '@/api/http';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { KeyResult } from './type';
 
 interface Goal {
   id: string;
   goalName: string;
   progress: number;
   total: number;
-  subGoals: string[];
+  keyResults: Array<KeyResult>;
   startTime: string;
   endTime: string;
 }
 
-const GoalItem = ({ goalName, progress, total, subGoals, startTime, endTime }: Goal) => {
+const GoalItem = ({ goalName, progress, total, keyResults, startTime, endTime }: Goal) => {
   const [expanded, setExpanded] = useState(false);
 
   const calculateRemainingDays = () => {
@@ -49,7 +51,7 @@ const GoalItem = ({ goalName, progress, total, subGoals, startTime, endTime }: G
       </TouchableOpacity>
       {expanded && (
         <FlatList
-          data={['xxxx', 'yyyy', 'zzzz']}
+          data={keyResults.map(keyResult => keyResult.resultName)}
           renderItem={({ item }) => <Text style={styles.subGoalText}>{item}</Text>}
           keyExtractor={(item, index) => index.toString()}
         />
@@ -82,33 +84,51 @@ export default function GoalList() {
   const handleDeleteGoal = async (goalId: string) => {
     try {
       await fetchData(`/goals/${goalId}`, 'DELETE');
-      Alert.alert('成功', '目标已删除');
+      AntdToast.success('目标已删除', 1);
       fetchGoals(); // 刷新目标列表
     } catch (error) {
-      Alert.alert('错误', '删除目标失败，请重试');
+      AntdToast.fail('删除目标失败，请重试', 1);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>目标列表</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddGoal}>
-          <Text style={styles.addButtonText}>+ 创建目标</Text>
-        </TouchableOpacity>
-      </View>
-      <SwipeListView
-        data={goals}
-        renderItem={({ item }) => <GoalItem {...item} />}
-        keyExtractor={item => item.id}
-        renderHiddenItem={({ item }) => (
-          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteGoal(item.id)}>
-            <Text style={styles.deleteButtonText}>删除</Text>
+    <Provider>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>目标列表</Text>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddGoal}>
+            <Text style={styles.addButtonText}>+ 创建目标</Text>
           </TouchableOpacity>
-        )}
-        rightOpenValue={-75}
-      />
-    </View>
+        </View>
+        <SwipeListView
+          data={goals}
+          renderItem={({ item }) => <GoalItem {...item} />}
+          keyExtractor={item => item.id}
+          renderHiddenItem={({ item }) => (
+            <>
+              <TouchableOpacity style={styles.editButton} onPress={() => {
+                router.push(`/(tabs)/(goal)/edit?goalId=${item.id}`);
+              }}>
+                <Text style={styles.editButtonText}>编辑</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => {
+                AntdModal.alert(
+                  '确认删除',
+                  '你确定要删除这个目标吗？',
+                  [
+                    { text: '取消', style: 'cancel' },
+                    { text: '确认', onPress: () => handleDeleteGoal(item.id) },
+                  ]
+                );
+              }}>
+                <Text style={styles.deleteButtonText}>删除</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          rightOpenValue={-150}
+        />
+      </View>
+    </Provider>
   );
 }
 
@@ -183,6 +203,16 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 8,
   },
+  editButton: {
+    backgroundColor: 'blue',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 75,
+    width: 75,
+    height: '100%',
+    borderRadius: 8,
+  },
   deleteButton: {
     backgroundColor: 'red',
     justifyContent: 'center',
@@ -197,4 +227,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  editButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  }
 });

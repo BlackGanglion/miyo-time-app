@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建一个 axios 实例
 const http = axios.create({
-  baseURL: 'http://192.168.1.15:3000', // 替换为你的 API 基础 URL
+  baseURL: 'http://192.168.3.12:3000', // 替换为你的 API 基础 URL
   timeout: 1000, // 请求超时时间
 });
 
@@ -12,7 +12,7 @@ export const fetchData = async (endpoint: string, method = 'GET', data = {}, opt
     const response = await http.request({
       url: endpoint,
       method: method.toLowerCase(), // 确保方法是小写
-      data: method.toLowerCase() === 'post' ? data : {}, // 仅在 POST 请求时传递数据
+      data: ['post', 'put', 'delete'].includes(method.toLowerCase()) ? data : {}, // 在 POST, PUT, DELETE 请求时传递数据
       ...options
     });
 

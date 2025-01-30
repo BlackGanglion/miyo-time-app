@@ -1,33 +1,38 @@
-import React, { useState } from 'react';
-import { Button, InputItem, List, DatePicker, Provider, Toast, Icon } from '@ant-design/react-native';
+import React, { useState, useEffect } from 'react';
+import { Provider, List, InputItem, DatePicker, Button, Toast, Icon } from '@ant-design/react-native';
 import { View, StyleSheet, Text } from 'react-native';
+import { useRouter, useGlobalSearchParams } from 'expo-router';
 import { fetchData } from '@/api/http';
-import { useRouter } from 'expo-router';
+import { KeyResult } from './type';
 
-export default function CreateGoal() {
+export default function EditGoal() {
+  const router = useRouter();
+  const { goalId } = useGlobalSearchParams();
   const [goalName, setGoalName] = useState('');
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [keyResults, setKeyResults] = useState<Array<{ resultName: string }>>([]);
-  const router = useRouter();
+  const [keyResults, setKeyResults] = useState<Array<KeyResult>>([]);
 
-  const handleCreateGoal = async () => {
-    try {
-      const data = await fetchData('/goals', 'POST', {
-        goalName, startTime, endTime, keyResults: keyResults,
-      });
+  useEffect(() => {
+    const fetchGoalDetails = async () => {
+      try {
+        const data = await fetchData(`/goals/${goalId}`, 'GET');
+        setGoalName(data.goalName);
+        setStartTime(new Date(data.startTime));
+        setEndTime(new Date(data.endTime));
+        setKeyResults(data.keyResults || []);
+      } catch (error) {
+        console.error('Failed to fetch goal details:', error);
+      }
+    };
 
-      // 显示成功消息
-      Toast.success('目标创建成功', 1);
-      router.push('/(tabs)/(goal)');
-    } catch (error) {
-      // 处理错误
-      Toast.fail('目标创建失败，请重试', 1);
+    if (goalId) {
+      fetchGoalDetails();
     }
-  };
+  }, [goalId]);
 
   const handleAddKeyResult = () => {
-    setKeyResults([...keyResults, { resultName: '' }]);
+    setKeyResults([...keyResults, { resultName: '' } as KeyResult]);
   };
 
   const handleKeyResultChange = (text: string, index: number) => {
@@ -39,6 +44,21 @@ export default function CreateGoal() {
   const handleDeleteKeyResult = (index: number) => {
     const newKeyResults = keyResults.filter((_, i) => i !== index);
     setKeyResults(newKeyResults);
+  };
+
+  const handleUpdateGoal = async () => {
+    try {
+      await fetchData(`/goals/${goalId}`, 'PUT', {
+        goalName,
+        startTime,
+        endTime,
+        keyResults,
+      });
+      Toast.success('目标已更新', 1);
+      router.push('/(tabs)/(goal)'); // 返回目标列表页
+    } catch (error) {
+      Toast.fail('更新目标失败，请重试', 1);
+    }
   };
 
   return (
@@ -87,24 +107,24 @@ export default function CreateGoal() {
               </View>
             ))}
           </>
-        </List>
-        <Button onPress={handleAddKeyResult} style={styles.addButton}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <Icon name="plus" size="md" />
-            <View style={{ marginLeft: 8 }}>
-              <Text>添加关键结果</Text>
+          <Button onPress={handleAddKeyResult} style={styles.addButton}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <Icon name="plus" size="md" />
+              <View style={{ marginLeft: 8 }}>
+                添加关键结果
+              </View>
             </View>
-          </View>
-        </Button>
-        <Button type="primary" onPress={handleCreateGoal} style={styles.buttonContainer}>
-          创建目标
+          </Button>
+        </List>
+        <Button type="primary" onPress={handleUpdateGoal} style={styles.buttonContainer}>
+          更新目标
         </Button>
       </View>
     </Provider>
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
@@ -113,10 +133,10 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 16,
   },
+  addButton: {
+    marginTop: 8,
+  },
   deleteButton: {
     marginLeft: 8,
-  },
-  addButton: {
-    marginTop: 16,
   },
 });
