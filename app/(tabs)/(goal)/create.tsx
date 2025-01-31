@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, InputItem, List, DatePicker, Provider, Toast, Icon } from '@ant-design/react-native';
+import { Button, Input, List, DatePicker, Provider, Toast, Icon } from '@ant-design/react-native';
 import { View, StyleSheet, Text } from 'react-native';
 import { fetchData } from '@/api/http';
 import { useRouter } from 'expo-router';
@@ -45,14 +45,11 @@ export default function CreateGoal() {
     <Provider>
       <View style={styles.container}>
         <List>
-          <InputItem
-            clear
+          <Input
             value={goalName}
-            onChange={setGoalName}
-            placeholder="目标名称"
-          >
-            目标名称
-          </InputItem>
+            onChangeText={setGoalName}
+            placeholder="请输入目标名称"
+          />
           <DatePicker
             value={startTime}
             mode="date"
@@ -72,15 +69,12 @@ export default function CreateGoal() {
           <>
             {keyResults.map((keyResult, index) => (
               <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <InputItem
-                  clear
+                <Input
                   value={keyResult.resultName}
-                  onChange={(text) => handleKeyResultChange(text, index)}
-                  placeholder={`关键结果 ${index + 1}`}
+                  onChangeText={(text) => handleKeyResultChange(text, index)}
+                  placeholder={`请输入关键结果 ${index + 1}`}
                   style={{ flex: 1 }}
-                >
-                  <Text>关键结果 {index + 1}</Text>
-                </InputItem>
+                />
                 <Button onPress={() => handleDeleteKeyResult(index)} style={styles.deleteButton}>
                   <Icon name="delete" size="md" />
                 </Button>
@@ -91,13 +85,11 @@ export default function CreateGoal() {
         <Button onPress={handleAddKeyResult} style={styles.addButton}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <Icon name="plus" size="md" />
-            <View style={{ marginLeft: 8 }}>
-              <Text>添加关键结果</Text>
-            </View>
+            <Text style={{ marginLeft: 8 }}>添加关键结果</Text>
           </View>
         </Button>
         <Button type="primary" onPress={handleCreateGoal} style={styles.buttonContainer}>
-          创建目标
+          <Text>创建目标</Text>
         </Button>
       </View>
     </Provider>
