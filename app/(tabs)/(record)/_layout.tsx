@@ -4,7 +4,7 @@ export default function RecordLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" />
-      {/* <Stack.Screen name="create" /> */}
+      <Stack.Screen name="create" />
     </Stack>
   )
 }

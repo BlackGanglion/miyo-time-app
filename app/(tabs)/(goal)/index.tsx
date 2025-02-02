@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { ProgressBar } from '@/components/ProgressBar';
 import { fetchData } from '@/api/http';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { KeyResult } from './type';
+import { KeyResult, Task } from './type';
 
 interface Goal {
   id: string;
@@ -13,11 +13,12 @@ interface Goal {
   progress: number;
   total: number;
   keyResults: Array<KeyResult>;
+  tasks: Array<Task>;
   startTime: string;
   endTime: string;
 }
 
-const GoalItem = ({ goalName, progress, total, keyResults, startTime, endTime }: Goal) => {
+const GoalItem = ({ goalName, tasks, keyResults, startTime, endTime }: Goal) => {
   const [expanded, setExpanded] = useState(false);
 
   const calculateRemainingDays = () => {
@@ -37,6 +38,9 @@ const GoalItem = ({ goalName, progress, total, keyResults, startTime, endTime }:
     }
   };
 
+  const progress = tasks.filter((task: Task) => task.status === 'COMPLETED').length;
+  const total = tasks.length;
+
   return (
     <View style={styles.goalItem}>
       <View style={styles.headerRow}>
@@ -45,7 +49,7 @@ const GoalItem = ({ goalName, progress, total, keyResults, startTime, endTime }:
           <Text style={styles.remainingButtonText}>{calculateRemainingDays()}</Text>
         </TouchableOpacity>
       </View>
-      {/* <ProgressBar progress={progress / total * 100} color="#3b82f6" /> */}
+      {total ? <ProgressBar progress={progress} total={total} color="#3b82f6" /> : null}
       <TouchableOpacity onPress={() => setExpanded(!expanded)}>
         <Text style={styles.expandButtonText}>{expanded ? '收起' : '展开'}</Text>
       </TouchableOpacity>
@@ -132,7 +136,7 @@ export default function GoalList() {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,

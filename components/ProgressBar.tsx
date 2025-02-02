@@ -1,18 +1,19 @@
 import { View, Text, StyleSheet } from 'react-native';
 
-export const ProgressBar = ({ progress = 0, color = '#3b82f6', height = 20 }) => {
+export const ProgressBar = ({ progress = 0, total = 0, color = '#3b82f6', height = 20 }) => {
+  const progressPercentage = total ? (progress / total * 100).toFixed(2) : '0';
   return (
     <View style={[styles.container, { height }]}>
       <View
         style={[
           styles.progress,
           {
-            width: `${progress}%`,
+            width: `${Number(progressPercentage)}%`,
             backgroundColor: color,
           },
         ]}
       />
-      <Text style={styles.progressText}>{`${progress}%`}</Text>
+      <Text style={styles.progressText}>{`${progress}/${total} (${progressPercentage}%)`}</Text>
     </View>
   );
 };
